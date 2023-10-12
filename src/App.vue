@@ -5,34 +5,34 @@ import { GPU_LIMITS, GPU_FEATURES, GPU_INFOS, GPU_TEXTURE_FORMATS, DESCRIPTIONS 
 import { ref } from 'vue'
 
 const userAgent = navigator.userAgent;
-const webgpuSupported = ref(false);
+const webgpuSupported = ref(false), GPU = ref(null);
 const gpuLimits = ref([]), gpuFeatures = ref([]), gpuInfos = ref([]), gpuFormats = ref([]);
 
 async function main() {
   if (!navigator.gpu) return;
   webgpuSupported.value = true;
 
-  const GPU = await navigator.gpu.requestAdapter({ powerPreference: 'high-performance' });
-  if (!GPU) return;
+  GPU.value = await navigator.gpu.requestAdapter({ powerPreference: 'high-performance' });
+  if (!GPU.value) return;
   
   GPU_FEATURES.forEach(feature => {
-    gpuFeatures.value.push([feature, GPU.features.has(feature)]);
+    gpuFeatures.value.push([feature, GPU.value.features.has(feature)]);
   });
 
-  const GPUInfo = await GPU.requestAdapterInfo();
+  const GPUInfo = await GPU.value.requestAdapterInfo();
   if (!GPUInfo) return;
 
   GPU_INFOS.forEach(info => {
     gpuInfos.value.push([info, GPUInfo[info]]);
   });
   gpuInfos.value.push(['preferredCanvasFormat', navigator.gpu.getPreferredCanvasFormat()]);
-  gpuInfos.value.push(['isFallbackAdapter', GPU.isFallbackAdapter]);
+  gpuInfos.value.push(['isFallbackAdapter', GPU.value.isFallbackAdapter]);
 
-  const GPUDevice = await GPU.requestDevice({ requiredFeatures: [...GPU.features.values()] });
+  const GPUDevice = await GPU.value.requestDevice({ requiredFeatures: [...GPU.value.features.values()] });
   if (!GPUDevice) return;
 
   GPU_LIMITS.forEach(limit => {
-    gpuLimits.value.push([limit, GPU.limits[limit], GPUDevice.limits[limit]]);
+    gpuLimits.value.push([limit, GPU.value.limits[limit], GPUDevice.limits[limit]]);
   });
 
   // Adapted from https://browserleaks.com/webgpu
@@ -60,7 +60,7 @@ main();
 
 <template>
   <h1>WebGPU Report</h1>
-  <Label v-if="webgpuSupported" color="#71d1ae"><img src="/true.png" width="25" /><h2>WebGPU is supported</h2></Label>
+  <Label v-if="webgpuSupported && GPU" color="#71d1ae"><img src="/true.png" width="25" /><h2>WebGPU is supported</h2></Label>
   <Label v-else color="#d17171"><img src="/false.png" width="25" /><h2>WebGPU isn't supported</h2></Label>
   <p id="user-agent"><b>Current User-Agent:</b> {{ userAgent }}</p><hr v-if="gpuInfos.length > 0"/>
   <Report v-if="gpuInfos.length > 0" title="GPU Informations" type="string" :datas="gpuInfos" :columns="['Information', 'Value']" :description="DESCRIPTIONS.infos" /><hr v-if="gpuLimits.length > 0"/>
