@@ -6,7 +6,7 @@ import { GPU_LIMITS, GPU_FEATURES, GPU_INFOS, GPU_TEXTURE_FORMATS, REPORT_DESCRI
 import { ref } from 'vue'
 
 const userAgent = navigator.userAgent;
-const webgpuSupported = ref(false), GPU = ref(null);
+const webgpuSupported = ref(false), GPU = ref(null), GPUDevice = ref(null);
 const gpuLimits = ref([]), gpuFeatures = ref([]), gpuInfos = ref([]), gpuFormats = ref([]);
 const error = ref('');
 const detailName = ref(''), detailDescription = ref(''), showDetail = ref(false);
@@ -28,14 +28,14 @@ async function main() {
     gpuFeatures.value.push([feature, GPU.value.features.has(feature)]);
   });
 
-  const GPUDevice = await GPU.value.requestDevice({ requiredFeatures: [...GPU.value.features.values()] });
-  if (!GPUDevice) {
+  GPUDevice.value = await GPU.value.requestDevice({ requiredFeatures: [...GPU.value.features.values()] });
+  if (!GPUDevice.value) {
     error.value = 'No device returned by GPUAdapter.requestDevice()';
     return;
   }
 
   GPU_LIMITS.forEach(limit => {
-    gpuLimits.value.push([limit, GPU.value.limits[limit], GPUDevice.limits[limit]]);
+    gpuLimits.value.push([limit, GPU.value.limits[limit], GPUDevice.value.limits[limit]]);
   });
 
   // Adapted from https://browserleaks.com/webgpu
@@ -54,7 +54,7 @@ async function main() {
       } catch (e) {
         return false
       }
-    }(GPUDevice, format) ? gpuFormats.value.push([format, true]) : gpuFormats.value.push([format, false]);
+    }(GPUDevice.value, format) ? gpuFormats.value.push([format, true]) : gpuFormats.value.push([format, false]);
   }
 
   const GPUInfo = await GPU.value.requestAdapterInfo();
