@@ -84,7 +84,7 @@ function onHover(attribute) {
 
 <template>
   <h1>WebGPU Report</h1>
-  <Label v-if="webgpuSupported && GPU" color="#71d1ae"><img src="/true.png" width="25" /><h2>WebGPU is supported</h2></Label>
+  <Label v-if="webgpuSupported && GPU && GPUDevice" color="#71d1ae"><img src="/true.png" width="25" /><h2>WebGPU is supported</h2></Label>
   <div v-else>
     <Label color="#d17171"><img src="/false.png" width="25" /><h2>WebGPU isn't supported</h2></Label>
     <p id="error">{{ error }}</p>
