@@ -19,7 +19,7 @@ function formatBytes(bytes) {
 <template>
   <div class="report">
     <h2>{{ title }}</h2>
-    <p>{{ description }}</p>
+    <p>{{ description }} <slot /></p>
     <table>
       <tr>
         <th v-for="(column, index) in columns">{{ column }}</th>
