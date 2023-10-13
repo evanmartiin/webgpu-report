@@ -93,6 +93,7 @@ main();
 h1 {
   font-size: 3.2em;
   line-height: 1.1;
+  text-align: center;
 }
 #user-agent {
   width: 40%;
@@ -107,5 +108,20 @@ hr {
   font-weight: bold;
   text-align: center;
   margin-top: 10px;
+}
+h2 {
+  font-size: 1.5em;
+}
+
+@media only screen and (max-width: 600px) {
+  h1 {
+    font-size: 2.5em;
+  }
+  h2 {
+    font-size: 1.2em;
+  }
+  #user-agent {
+    width: 90%;
+  }
 }
 </style>
