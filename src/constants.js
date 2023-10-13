@@ -1,6 +1,7 @@
 const GPU_LIMITS = [
     "maxBindGroups",
     "maxBindingsPerBindGroup",
+    "maxBindGroupsPlusVertexBuffers",
     "maxBufferSize",
     "maxColorAttachmentBytesPerSample",
     "maxColorAttachments",
@@ -151,11 +152,57 @@ const GPU_TEXTURE_FORMATS = [
     "astc-12x12-unorm-srgb",
 ];
 
-const DESCRIPTIONS = {
+const REPORT_DESCRIPTIONS = {
     infos: "Informations about your GPUAdapter given to your browser. Values may differ depending on your browser.",
     limits: "Limits supported by your GPUAdapter, compared with the minimum limits theoretically supported by all WebGPU implementations. Values in bold are the limits of your GPUAdapter that are better than the minimum limit. Limits may differ depending on your browser.",
     features: "Additional functionalities supported by your GPUAdapter. Support may differ depending on your browser.",
     formats: "Texture formats supported by your GPUAdapter. Support may differ depending on your browser.",
 };
 
-export { GPU_LIMITS, GPU_FEATURES, GPU_INFOS, GPU_TEXTURE_FORMATS, DESCRIPTIONS };
+const INFO_DESCRIPTIONS = {
+    maxBindGroups: "The maximum number of GPUBindGroupLayouts allowed in bindGroupLayouts when creating a GPUPipelineLayout.",
+    maxBindingsPerBindGroup: "The number of binding indices available when creating a GPUBindGroupLayout.",
+    maxBindGroupsPlusVertexBuffers: "The maximum number of bind group and vertex buffer slots used simultaneously, counting any empty slots below the highest index. Validated in createRenderPipeline() and in draw calls.",
+    maxBufferSize: "The maximum value of size attribute when creating a GPUBuffer.",
+    maxColorAttachmentBytesPerSample: "The maximum number of bytes necessary to hold one sample (pixel or subpixel) of render pipeline output data, across all color attachments.",
+    maxColorAttachments: "The maximum allowed number of color attachments in GPURenderPipelineDescriptor.fragment.targets, GPURenderPassDescriptor.colorAttachments, and GPURenderPassLayout.colorFormats.",
+    maxComputeInvocationsPerWorkgroup: "The maximum value of the product of the workgroup_size dimensions for a compute stage GPUShaderModule entry-point.",
+    maxComputeWorkgroupSizeX: "The maximum value of the workgroup_size X dimension for a compute stage GPUShaderModule entry-point.",
+    maxComputeWorkgroupSizeY: "The maximum value of the workgroup_size Y dimension for a compute stage GPUShaderModule entry-point.",
+    maxComputeWorkgroupSizeZ: "The maximum value of the workgroup_size Z dimension for a compute stage GPUShaderModule entry-point.",
+    maxComputeWorkgroupStorageSize: "The maximum number of bytes of workgroup storage used for a compute stage GPUShaderModule entry-point.",
+    maxComputeWorkgroupsPerDimension: "The maximum value for the arguments of dispatchWorkgroups(workgroupCountX, workgroupCountY, workgroupCountZ).",
+    maxDynamicStorageBuffersPerPipelineLayout: "The maximum number of GPUBindGroupLayoutEntry entries across a GPUPipelineLayout which are storage buffers with dynamic offsets.",
+    maxDynamicUniformBuffersPerPipelineLayout: "The maximum number of GPUBindGroupLayoutEntry entries across a GPUPipelineLayout which are uniform buffers with dynamic offsets.",
+    maxInterStageShaderComponents: "The maximum allowed number of components of input or output variables for inter-stage communication (like vertex outputs or fragment inputs).",
+    maxInterStageShaderVariables: "The maximum allowed number of input or output variables for inter-stage communication (like vertex outputs or fragment inputs).",
+    maxSampledTexturesPerShaderStage: "For each possible GPUShaderStage stage, the maximum number of GPUBindGroupLayoutEntry entries across a GPUPipelineLayout which are sampled textures.",
+    maxSamplersPerShaderStage: "For each possible GPUShaderStage stage, the maximum number of GPUBindGroupLayoutEntry entries across a GPUPipelineLayout which are samplers.",
+    maxStorageBufferBindingSize: "The maximum GPUBufferBinding.size for bindings with a GPUBindGroupLayoutEntry entry for which entry.buffer?.type is 'storage' or 'read-only-storage'.",
+    maxStorageBuffersPerShaderStage: "For each possible GPUShaderStage stage, the maximum number of GPUBindGroupLayoutEntry entries across a GPUPipelineLayout which are storage buffers.",
+    maxStorageTexturesPerShaderStage: "For each possible GPUShaderStage stage, the maximum number of GPUBindGroupLayoutEntry entries across a GPUPipelineLayout which are storage textures.",
+    maxTextureArrayLayers: "The maximum allowed value for the size.depthOrArrayLayers of a texture created with dimension '2d'.",
+    maxTextureDimension1D: "The maximum allowed value for the size.width of a texture created with dimension '1d'.",
+    maxTextureDimension2D: "The maximum allowed value for the size.width and size.height of a texture created with dimension '2d'.",
+    maxTextureDimension3D: "The maximum allowed value for the size.width, size.height and size.depthOrArrayLayers of a texture created with dimension '3d'.",
+    maxUniformBufferBindingSize: "The maximum GPUBufferBinding.size for bindings with a GPUBindGroupLayoutEntry entry for which entry.buffer?.type is 'uniform'.",
+    maxUniformBuffersPerShaderStage: "For each possible GPUShaderStage stage, the maximum number of GPUBindGroupLayoutEntry entries across a GPUPipelineLayout which are uniform buffers.",
+    maxVertexAttributes: "The maximum number of attributes in total across buffers when creating a GPURenderPipeline.",
+    maxVertexBufferArrayStride: "The maximum allowed arrayStride when creating a GPURenderPipeline.",
+    maxVertexBuffers: "The maximum number of buffers when creating a GPURenderPipeline.",
+    minStorageBufferOffsetAlignment: "The required alignment for GPUBufferBinding.offset and the dynamic offsets provided in setBindGroup(), for bindings with a GPUBindGroupLayoutEntry entry for which entry.buffer?.type is 'storage' or 'read-only-storage'.",
+    minUniformBufferOffsetAlignment: "The required alignment for GPUBufferBinding.offset and the dynamic offsets provided in setBindGroup(), for bindings with a GPUBindGroupLayoutEntry entry for which entry.buffer?.type is 'uniform'.",
+    "depth-clip-control": "Allows depth clipping to be disabled.",
+    "depth32float-stencil8": "Allows for explicit creation of textures of format 'depth32float-stencil8'.",
+    "texture-compression-bc": "Allows for explicit creation of textures of BC compressed formats.",
+    "texture-compression-etc2": "Allows for explicit creation of textures of ETC2 compressed formats.",
+    "texture-compression-astc": "Allows for explicit creation of textures of ASTC compressed formats.",
+    "timestamp-query": "Adds the ability to query timestamps from GPU command buffers.",
+    "indirect-first-instance": "Allows the use of non-zero firstInstance values in indirect draw parameters and indirect drawIndexed parameters.",
+    "shader-f16": "Allows the use of the half-precision floating-point type f16 in WGSL.",
+    "rg11b10ufloat-renderable": "Allows the RENDER_ATTACHMENT usage on textures with format 'rg11b10ufloat', and also allows textures of that format to be blended and multisampled.",
+    "bgra8unorm-storage": "Allows the STORAGE_BINDING usage on textures with format 'bgra8unorm'.",
+    "float32-filterable": "Makes textures with formats 'r32float', 'rg32float', and 'rgba32float' filterable.",
+};
+
+export { GPU_LIMITS, GPU_FEATURES, GPU_INFOS, GPU_TEXTURE_FORMATS, REPORT_DESCRIPTIONS, INFO_DESCRIPTIONS };

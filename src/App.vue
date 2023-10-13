@@ -1,13 +1,15 @@
 <script setup>
 import Report from './components/Report.vue'
 import Label from './components/Label.vue'
-import { GPU_LIMITS, GPU_FEATURES, GPU_INFOS, GPU_TEXTURE_FORMATS, DESCRIPTIONS } from './constants.js'
+import Detail from './components/Detail.vue'
+import { GPU_LIMITS, GPU_FEATURES, GPU_INFOS, GPU_TEXTURE_FORMATS, REPORT_DESCRIPTIONS, INFO_DESCRIPTIONS } from './constants.js'
 import { ref } from 'vue'
 
 const userAgent = navigator.userAgent;
 const webgpuSupported = ref(false), GPU = ref(null);
 const gpuLimits = ref([]), gpuFeatures = ref([]), gpuInfos = ref([]), gpuFormats = ref([]);
 const error = ref('');
+const detailName = ref(''), detailDescription = ref(''), showDetail = ref(false);
 
 async function main() {
   if (!navigator.gpu) {
@@ -67,6 +69,17 @@ async function main() {
 }
 
 main();
+
+function onHover(attribute) {
+  const description = INFO_DESCRIPTIONS[attribute];
+  if (!description) {
+    showDetail.value = false;
+    return;
+  }
+  showDetail.value = true;
+  detailName.value = attribute;
+  detailDescription.value = description;
+}
 </script>
 
 <template>
@@ -77,16 +90,19 @@ main();
     <p id="error">{{ error }}</p>
   </div>
   <p id="user-agent"><b>Current User-Agent:</b> {{ userAgent }}</p><hr v-if="gpuInfos.length > 0"/>
-  <Report v-if="gpuInfos.length > 0" title="GPU Informations" type="string" :datas="gpuInfos" :columns="['Information', 'Value']" :description="DESCRIPTIONS.infos" /><hr v-if="gpuLimits.length > 0"/>
-  <Report v-if="gpuLimits.length > 0" title="GPU Limits" type="number" :datas="gpuLimits" :columns="['Limit name', 'Your GPU limit', 'Default minimal limit']" :description="DESCRIPTIONS.limits">
+  <Report @on-hover="onHover" v-if="gpuInfos.length > 0" title="GPU Informations" type="string" :datas="gpuInfos" :columns="['Information', 'Value']" :description="REPORT_DESCRIPTIONS.infos" /><hr v-if="gpuLimits.length > 0"/>
+  <Report @on-hover="onHover" v-if="gpuLimits.length > 0" title="GPU Limits" type="number" :datas="gpuLimits" :columns="['Limit name', 'Your GPU limit', 'Default minimal limit']" :description="REPORT_DESCRIPTIONS.limits">
     <span>Follows the <a href="https://gpuweb.github.io/gpuweb/#supported-limits" target="_blank">exhaustive list of supported limits</a> of the W3C's WebGPU specification.</span>
   </Report><hr v-if="gpuFeatures.length > 0"/>
-  <Report v-if="gpuFeatures.length > 0" title="GPU Features" type="boolean" :datas="gpuFeatures" :columns="['Feature name', 'Supported']" :description="DESCRIPTIONS.features">
+  <Report @on-hover="onHover" v-if="gpuFeatures.length > 0" title="GPU Features" type="boolean" :datas="gpuFeatures" :columns="['Feature name', 'Supported']" :description="REPORT_DESCRIPTIONS.features">
     <span>Follows the <a href="https://gpuweb.github.io/gpuweb/#feature-index" target="_blank">exhaustive list of features</a> of the W3C's WebGPU specification.</span>
   </Report><hr v-if="gpuFormats.length > 0" />
-  <Report v-if="gpuFormats.length > 0" title="GPU Texture Formats" type="boolean" :datas="gpuFormats" :columns="['Format name', 'Supported']" :description="DESCRIPTIONS.formats">
+  <Report @on-hover="onHover" v-if="gpuFormats.length > 0" title="GPU Texture Formats" type="boolean" :datas="gpuFormats" :columns="['Format name', 'Supported']" :description="REPORT_DESCRIPTIONS.formats">
     <span>Follows the <a href="https://gpuweb.github.io/gpuweb/#enumdef-gputextureformat" target="_blank">exhaustive list of texture formats</a> of the W3C's WebGPU specification.</span>
   </Report>
+  <Transition name="fade">
+    <Detail v-if="showDetail" :name="detailName" :description="detailDescription" />
+  </Transition>
 </template>
 
 <style scoped>
@@ -112,7 +128,15 @@ hr {
 h2 {
   font-size: 1.5em;
 }
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.5s ease;
+}
 
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
 @media only screen and (max-width: 600px) {
   h1 {
     font-size: 2.5em;
