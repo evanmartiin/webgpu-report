@@ -113,5 +113,8 @@ table tr:first-child th:last-child {
   p {
     width: 80vw;
   }
+  .report {
+    padding-right: 50px;
+  }
 }
 </style>

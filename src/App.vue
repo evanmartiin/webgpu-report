@@ -155,5 +155,8 @@ h2 {
   #user-agent {
     width: 90%;
   }
+  hr {
+    width: 100%;
+  }
 }
 </style>
