@@ -39,3 +39,10 @@ a {
 a:hover {
   border-bottom: 2px solid #04AA6D;
 }
+
+
+@media only screen and (max-width: 600px) {
+  #app {
+    align-items: flex-start;
+  }
+}

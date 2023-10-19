@@ -83,13 +83,15 @@ function onHover(attribute) {
 </script>
 
 <template>
-  <h1>WebGPU Report</h1>
-  <Label v-if="webgpuSupported && GPU && GPUDevice" color="#71d1ae"><img src="/true.png" width="25" /><h2>WebGPU is supported</h2></Label>
-  <div v-else>
-    <Label color="#d17171"><img src="/false.png" width="25" /><h2>WebGPU isn't supported</h2></Label>
-    <p id="error">{{ error }}</p>
+  <div id="header">
+    <h1>WebGPU Report</h1>
+    <Label v-if="webgpuSupported && GPU && GPUDevice" color="#71d1ae"><img src="/true.png" width="25" /><h2>WebGPU is supported</h2></Label>
+    <div v-else>
+      <Label color="#d17171"><img src="/false.png" width="25" /><h2>WebGPU isn't supported</h2></Label>
+      <p id="error">{{ error }}</p>
+    </div>
+    <p id="user-agent"><b>Current User-Agent:</b> {{ userAgent }}</p><hr v-if="gpuInfos.length > 0"/>
   </div>
-  <p id="user-agent"><b>Current User-Agent:</b> {{ userAgent }}</p><hr v-if="gpuInfos.length > 0"/>
   <Report @on-hover="onHover" v-if="gpuInfos.length > 0" title="GPU Informations" type="string" :datas="gpuInfos" :columns="['Information', 'Value']" :description="REPORT_DESCRIPTIONS.infos" /><hr v-if="gpuLimits.length > 0"/>
   <Report @on-hover="onHover" v-if="gpuLimits.length > 0" title="GPU Limits" type="number" :datas="gpuLimits" :columns="['Limit name', 'Your GPU limit', 'Default minimal limit']" :description="REPORT_DESCRIPTIONS.limits">
     <span>Follows the <a href="https://gpuweb.github.io/gpuweb/#supported-limits" target="_blank">exhaustive list of supported limits</a> of the W3C's WebGPU specification.</span>
@@ -106,6 +108,12 @@ function onHover(attribute) {
 </template>
 
 <style scoped>
+#header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 40px;
+}
 h1 {
   font-size: 3.2em;
   line-height: 1.1;

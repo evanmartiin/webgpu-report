@@ -109,4 +109,9 @@ table tr:first-child th:last-child {
 .false {
   color: #d17171;
 }
+@media only screen and (max-width: 600px) {
+  p {
+    width: 80vw;
+  }
+}
 </style>
